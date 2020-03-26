@@ -8,4 +8,6 @@ public interface RifRecordBase {
   Optional<Date> getLastUpdated();
 
   void setLastUpdated(Date lastUpdated);
+
+  String getId();
 }

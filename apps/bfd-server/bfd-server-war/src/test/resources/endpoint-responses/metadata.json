@@ -59,9 +59,17 @@
         "type" : "date",
         "documentation" : "Include resources last updated in the given range"
       }, {
+        "name" : "cursor",
+        "type" : "string",
+        "documentation" : "Experimental: cursor for the result set"
+      }, {
         "name" : "excludeSAMHSA",
         "type" : "string",
         "documentation" : "If true, exclude all SAMHSA-related resources"
+      }, {
+        "name" : "limit",
+        "type" : "string",
+        "documentation" : "Experimental: limit the result set"
       }, {
         "name" : "startIndex",
         "type" : "string",

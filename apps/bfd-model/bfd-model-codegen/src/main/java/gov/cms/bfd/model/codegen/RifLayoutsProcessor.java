@@ -784,6 +784,26 @@ public final class RifLayoutsProcessor extends AbstractProcessor {
             .build();
     headerEntityClass.addMethod(lastUpdatedSetter);
 
+    // Getter method for the id
+    if (mappingSpec.getHeaderEntityIdField() != null) {
+      final MethodSpec getIdMethod =
+          MethodSpec.methodBuilder("getId")
+              .addModifiers(Modifier.PUBLIC)
+              .addStatement("return $N.toString()", mappingSpec.getHeaderEntityIdField())
+              .returns(TypeName.get(String.class))
+              .build();
+      headerEntityClass.addMethod(getIdMethod);
+    } else {
+      final MethodSpec getIdMethod =
+          MethodSpec.methodBuilder("getId")
+              .addModifiers(Modifier.PUBLIC)
+              .addStatement(
+                  "return Long.toString($N)", mappingSpec.getHeaderEntityGeneratedIdField())
+              .returns(TypeName.get(String.class))
+              .build();
+      headerEntityClass.addMethod(getIdMethod);
+    }
+
     TypeSpec headerEntityFinal = headerEntityClass.build();
     JavaFile headerEntityFile =
         JavaFile.builder(mappingSpec.getPackageName(), headerEntityFinal).build();

@@ -19,9 +19,11 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.newrelic.api.agent.Trace;
 import gov.cms.bfd.model.rif.Beneficiary;
+import gov.cms.bfd.model.rif.RifRecordBase;
 import gov.cms.bfd.server.war.Operation;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -193,6 +195,12 @@ public final class ExplanationOfBenefitResourceProvider implements IResourceProv
       @OptionalParam(name = "startIndex")
           @Description(shortDefinition = "The offset used for result pagination")
           String startIndex,
+      @OptionalParam(name = "cursor")
+          @Description(shortDefinition = "Experimental: cursor for the result set")
+          String cursor,
+      @OptionalParam(name = "limit")
+          @Description(shortDefinition = "Experimental: limit the result set")
+          String limit,
       @OptionalParam(name = "excludeSAMHSA")
           @Description(shortDefinition = "If true, exclude all SAMHSA-related resources")
           String excludeSamhsa,
@@ -200,6 +208,15 @@ public final class ExplanationOfBenefitResourceProvider implements IResourceProv
           @Description(shortDefinition = "Include resources last updated in the given range")
           DateRangeParam lastUpdated,
       RequestDetails requestDetails) {
+
+    /*
+     * Experimental cursor paging.
+     */
+    if (limit != null) {
+      return experimentalFindByPatient(
+          patient, type, cursor, limit, excludeSamhsa, lastUpdated, requestDetails);
+    }
+
     /*
      * startIndex is an optional parameter here because it must be declared in the
      * event it is passed in. However, it is not being used here because it is also
@@ -347,6 +364,142 @@ public final class ExplanationOfBenefitResourceProvider implements IResourceProv
       eobsByBeneIdQueryNanoSeconds = timerEobQuery.stop();
       TransformerUtils.recordQueryInMdc(
           String.format("eobs_by_bene_id.%s", claimType.name().toLowerCase()),
+          eobsByBeneIdQueryNanoSeconds,
+          claimEntities == null ? 0 : claimEntities.size());
+    }
+
+    return claimEntities;
+  }
+
+  @Trace
+  private Bundle experimentalFindByPatient(
+      ReferenceParam patient,
+      TokenAndListParam type,
+      String cursor,
+      String limit,
+      String excludeSamhsa,
+      DateRangeParam lastUpdated,
+      RequestDetails requestDetails) {
+    String beneficiaryId = patient.getIdPart();
+    Set<ClaimType> claimTypes = parseTypeParam(type);
+    EOBLinkBuilder paging = new EOBLinkBuilder(requestDetails.getCompleteUrl());
+
+    Operation operation = new Operation(Operation.Endpoint.V1_EOB);
+    operation.setOption("by", "patient");
+    operation.setOption(
+        "types",
+        (claimTypes.size() == ClaimType.values().length)
+            ? "*"
+            : claimTypes.stream()
+                .sorted(Comparator.comparing(ClaimType::name))
+                .collect(Collectors.toList())
+                .toString());
+    operation.setOption("limit", paging.isPagingRequested() ? "" + paging.getPageSize() : "*");
+    operation.publishOperationName();
+
+    // Optimize when the lastUpdated parameter is specified and result set is empty
+    if (loadedFilterManager.isResultSetEmpty(beneficiaryId, lastUpdated)) {
+      return TransformerUtils.createBundle(
+          Collections.emptyList(), loadedFilterManager.getTransactionTime());
+    }
+
+    // Calculate the list of claim types needed, based the types parameter and a cursor
+    List<ClaimType> orderedClaimTypes = Arrays.asList(ClaimType.values());
+    if (paging.getClaimType().isPresent()) {
+      int cursorClaimTypeIndex = orderedClaimTypes.indexOf(paging.getClaimType().get());
+      orderedClaimTypes = orderedClaimTypes.subList(cursorClaimTypeIndex, orderedClaimTypes.size());
+    }
+    if (type != null) {
+      orderedClaimTypes =
+          orderedClaimTypes.stream().filter(claimTypes::contains).collect(Collectors.toList());
+    }
+
+    /*
+     * The way our JPA/SQL schema is setup, we have to run a separate search for
+     * each claim type, then combine the results. It's not super efficient, but it's
+     * also not so inefficient that it's worth fixing.
+     */
+    List<IBaseResource> eobs = new ArrayList<IBaseResource>();
+    String nextCursor = null;
+    Optional<String> beforeClaimId = paging.getClaimId();
+    for (ClaimType claimType : orderedClaimTypes) {
+      List<RifRecordBase> claims =
+          experimentalFindClaimTypeByPatient(
+              claimType,
+              beneficiaryId,
+              lastUpdated,
+              paging.getPageSize() - eobs.size(),
+              beforeClaimId.orElse(null));
+
+      eobs.addAll(transformToEobs(claimType, claims));
+
+      if (eobs.size() >= paging.getPageSize()) {
+        nextCursor = paging.buildNextCursor(claimType, claims);
+        break;
+      } else {
+        beforeClaimId = Optional.empty();
+      }
+    }
+
+    if (Boolean.parseBoolean(excludeSamhsa)) filterSamhsa(eobs);
+
+    Bundle bundle = TransformerUtils.createBundle(eobs, loadedFilterManager.getTransactionTime());
+    paging.addLinksToBundle(bundle, nextCursor);
+    return bundle;
+  }
+
+  /**
+   * @param claimType the {@link ClaimType} to find
+   * @param patientId the {@link Beneficiary#getBeneficiaryId()} to filter by
+   * @param lastUpdated the update time to filter by
+   * @return the matching claim/event entities
+   */
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  @Trace
+  private <T> List<T> experimentalFindClaimTypeByPatient(
+      ClaimType claimType,
+      String patientId,
+      DateRangeParam lastUpdated,
+      Integer limit,
+      String beforeBeneId) {
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    CriteriaQuery criteria = builder.createQuery((Class) claimType.getEntityClass());
+    Root root = criteria.from(claimType.getEntityClass());
+    claimType.getEntityLazyAttributes().stream().forEach(a -> root.fetch(a));
+    String claimId = claimType.getEntityIdAttribute().getName();
+    criteria.select(root).distinct(true);
+
+    // Search for a beneficiary's records. Use lastUpdated if present
+    Predicate wherePredicate =
+        builder.equal(root.get(claimType.getEntityBeneficiaryIdAttribute()), patientId);
+    if (lastUpdated != null && !lastUpdated.isEmpty()) {
+      Predicate predicate = QueryUtils.createLastUpdatedPredicate(builder, root, lastUpdated);
+      wherePredicate = builder.and(wherePredicate, predicate);
+    }
+    if (beforeBeneId != null && !beforeBeneId.isEmpty()) {
+      Predicate predicate = builder.greaterThan(root.get(claimId), beforeBeneId);
+      wherePredicate = builder.and(wherePredicate, predicate);
+    }
+    criteria.where(wherePredicate);
+    criteria.orderBy(builder.asc(root.get(claimId)));
+
+    List claimEntities = null;
+    Long eobsByBeneIdQueryNanoSeconds = null;
+    Timer.Context timerEobQuery =
+        metricRegistry
+            .timer(
+                MetricRegistry.name(
+                    metricRegistry.getClass().getSimpleName(),
+                    "query",
+                    "eobs_by_bene_id_x",
+                    claimType.name().toLowerCase()))
+            .time();
+    try {
+      claimEntities = entityManager.createQuery(criteria).setMaxResults(limit).getResultList();
+    } finally {
+      eobsByBeneIdQueryNanoSeconds = timerEobQuery.stop();
+      TransformerUtils.recordQueryInMdc(
+          String.format("eobs_by_bene_id_x.%s", claimType.name().toLowerCase()),
           eobsByBeneIdQueryNanoSeconds,
           claimEntities == null ? 0 : claimEntities.size());
     }
