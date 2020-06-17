@@ -6,7 +6,6 @@
 #   update-keystores.sh [-h|--help] [-d|--update-ca-certs] [-e|--environment name] [-s|--source-dir path] <output directory>
 #
 # ---------------------------------------------------------------------------
-
 PROGNAME=${0##*/}
 
 # Store and key passwords. These default to 'changeit', but you can overide by setting and exporting
@@ -21,9 +20,9 @@ entrust_root="https://ocio.nih.gov/Smartcard/Documents/Entrust%20Managed%20Servi
 intermediate="https://ocio.nih.gov/Smartcard/Documents/HHS-FPKI-Intermediate.cer"
 ca_cert_urls=("$fed_root" "$entrust_root" "$intermediate")
 
-# ca_cert_chain - An array of containing each CA root/intermediate certificate chain IN ORDER. 
-# the --update-ca-certs option downloads the chain using the url's above. WE also convert the chain
-# to PEM format and rename to make script friendly.
+# ca_cert_chain - An array containing the CA root/intermediate certificate chain certificates.
+# The --update-ca-certs option downloads the chain using the url's above. We also convert the chain
+# to PEM format and do some renaming to make them script friendly.
 ca_certs=("federal_cp_root_sha256.pem" "entrust_managed_services_root_ca.pem" "hhs_fpki_intermediate.pem")
 
 
@@ -83,13 +82,13 @@ help_message() {
   $(usage)
 
   Examples:
-    # Export prod, prod-sbx, and test's encrypted BFD keystores to ~/Desktop
+    # Build all environments keystores (prod, prod-sbx, and test) and export to ~/Desktop.
     ./$PROGNAME --source-dir /path/to/Keybase/dir ~/Desktop
 
-    # Export just test's encrypted BFD keystore to the project (overwrites existing keystore)
-    ./$PROGNAME --source-dir /path/to/Keybase/dir -e test --force ../../ansible/playbooks-ccs/files
+    # Just build nad export the test and prod-sbx keystores and do not prompt to overwrite existing files.
+    ./$PROGNAME --source-dir /path/to/Keybase/dir -e test -e prod-sbx --force ../../ansible/playbooks-ccs/files
 
-    # Export all to the current working directory, but download the CA root chain first.
+    # Download the CA root chain from the internet and then build and export all to the current working directory.
     ./$PROGNAME --source-dir /path/to/Keybase/dir --update-ca-certs
 
   Options:
@@ -214,7 +213,7 @@ fetch_certs(){
       local underscores="${fix_spaces// /_}"    # replace spaces with underscores
       local dashes="${underscores//-/_}"        # replace dashes with underscores
       local pem="${dashes%%.*}.pem"             # rename
-      cp -f "$p" "$tmp_dir"/"$pem"                    # copy to our tmp working directory
+      cp -f "$p" "$tmp_dir"/"$pem"              # copy to our tmp working directory
       printf "."
     done
   )
@@ -263,7 +262,7 @@ get_vault_pass(){
   [ -n "$VAULT_PASS" ] && return 0
 
   # else, prompt for it
-  read -s -r p "Enter Vault Password: " VAULT_PASS
+  read -s -r -p "Enter Vault Password: " VAULT_PASS
 
   # make sure it's not empty
   [ -z "$VAULT_PASS" ] && error_exit "Please set vault pass"
@@ -283,7 +282,7 @@ encrypt_and_export_keystore(){
       cp -f "$keystore" "$dst_dir"/"$keystore"
     else
       if [[ -f "$dst_dir"/"$keystore" ]]; then
-        read -r -p "Overwrite existing keystore? [y/n] " response
+        read -r -p "Overwrite $dst_dir/$keystore? [y/n] " response
         if [[ "$response" == "y" ]]; then
           cp -f "$keystore" "$dst_dir"/"$keystore"
         else
@@ -348,7 +347,7 @@ check_files
 
 # ready to import
 for e in "${environments[@]}"; do
-  # copy out pristine keystores and signed tls cert to tmp
+  # copy our pristine keystores and signed tls cert to tmp
   cp "$src_dir/${e}_bfd_cms_gov.jks" "$tmp_dir"
   cp "$src_dir/${e}.bfd.cms.gov.pem" "$tmp_dir"
 
