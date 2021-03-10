@@ -125,8 +125,8 @@
 					<configuration>
 						<toolchains>
 							<jdk>
-								<!-- Use a Java 8 JDK. -->
-								<version>1.8</version>
+								<!-- Use a Java 15 JDK. -->
+								<version>1.15</version>
 							</jdk>
 						</toolchains>
 					</configuration>

@@ -3,12 +3,12 @@
 	<toolchain>
 		<type>jdk</type>
 		<provides>
-			<version>1.8</version>
+			<version>1.15</version>
 			<vendor>openjdk</vendor>
-			<id>openjdk-8-jdk</id>
+			<id>openjdk-15-jdk</id>
 		</provides>
 		<configuration>
-			<jdkHome>/usr/lib/jvm/java-1.8.0-openjdk</jdkHome>
+			<jdkHome>/usr/lib/jvm/java-1.15.0.2-openjdk</jdkHome>
 		</configuration>
 	</toolchain>
 </toolchains>
