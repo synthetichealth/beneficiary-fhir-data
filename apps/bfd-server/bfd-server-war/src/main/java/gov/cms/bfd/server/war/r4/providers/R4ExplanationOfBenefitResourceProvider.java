@@ -124,7 +124,7 @@ public final class R4ExplanationOfBenefitResourceProvider
   @SuppressWarnings({"rawtypes", "unchecked"})
   @Read(version = false)
   @Trace
-  public ExplanationOfBenefit read(@IdParam IdType eobId) {
+  public ExplanationOfBenefit read(@IdParam IdType eobId, RequestDetails requestDetails) {
     if (eobId == null) throw new IllegalArgumentException();
     if (eobId.getVersionIdPartAsLong() != null) throw new IllegalArgumentException();
 
@@ -232,9 +232,9 @@ public final class R4ExplanationOfBenefitResourceProvider
 
     RequestHeaders requestHeader = RequestHeaders.getHeaderWrapper(requestDetails);
 
-    boolean includeTax = requestHeader.getValue(HEADER_NAME_INCLUDE_TAX_NUM_FIELDS);
+    String includeTax = requestHeader.getValue(HEADER_NAME_INCLUDE_TAX_NUM_FIELDS);
 
-    Operation operation = new Operation(Operation.Endpoint.V1_EOB);
+    Operation operation = new Operation(Operation.Endpoint.V2_EOB);
     operation.setOption("by", "patient");
     operation.setOption(
         "types",

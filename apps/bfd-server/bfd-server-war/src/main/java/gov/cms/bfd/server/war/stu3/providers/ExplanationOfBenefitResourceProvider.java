@@ -123,7 +123,7 @@ public final class ExplanationOfBenefitResourceProvider
   @SuppressWarnings({"rawtypes", "unchecked"})
   @Read(version = false)
   @Trace
-  public ExplanationOfBenefit read(@IdParam IdType eobId) {
+  public ExplanationOfBenefit read(@IdParam IdType eobId, RequestDetails requestDetails) {
     if (eobId == null) throw new IllegalArgumentException();
     if (eobId.getVersionIdPartAsLong() != null) throw new IllegalArgumentException();
 
