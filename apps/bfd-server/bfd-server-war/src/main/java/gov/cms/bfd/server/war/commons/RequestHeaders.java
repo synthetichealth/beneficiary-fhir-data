@@ -26,6 +26,9 @@ public class RequestHeaders {
           if (h.equals(CommonHeaders.HEADER_NAME_INCLUDE_ADDRESS_FIELDS)) {
             this.headerNVs.put(h, returnIncludeAddressFieldsValue(v));
           }
+          if (h.equals(CommonHeaders.HEADER_NAME_INCLUDE_TAX_NUM_FIELDS)) {
+            this.headerNVs.put(h, returnIncludeTaxNumFieldsValue(v));
+          }
           if (h.equals(CommonHeaders.HEADER_NAME_INCLUDE_IDENTIFIERS)) {
             this.headerNVs.put(h, returnIncludeIdentifiersValues(v));
           }
@@ -73,6 +76,9 @@ public class RequestHeaders {
           String v = nvPairs.get(h);
           if (h.equals(CommonHeaders.HEADER_NAME_INCLUDE_ADDRESS_FIELDS)) {
             this.headerNVs.put(h, returnIncludeAddressFieldsValue(v));
+          }
+          if (h.equals(CommonHeaders.HEADER_NAME_INCLUDE_TAX_NUM_FIELDS)) {
+            this.headerNVs.put(h, returnIncludeTaxNumFieldsValue(v));
           }
           if (h.equals(CommonHeaders.HEADER_NAME_INCLUDE_IDENTIFIERS)) {
             this.headerNVs.put(h, returnIncludeIdentifiersValues(v));
@@ -182,6 +188,21 @@ public class RequestHeaders {
    * @return True or False.
    */
   public static Boolean returnIncludeAddressFieldsValue(String headerValue) {
+    return (headerValue == null
+            || headerValue == ""
+            || headerValue.equalsIgnoreCase("FALSE")
+            || !headerValue.equalsIgnoreCase("TRUE"))
+        ? Boolean.FALSE
+        : Boolean.TRUE;
+  }
+
+  /**
+   * Return a TRUE / FALSE from VALID_HEADER_VALUES_INCLUDE_TAX_NUM_IDENTIFIERS header
+   *
+   * @param headerValue a String containing Boolean value in string form
+   * @return True or False.
+   */
+  public static Boolean returnIncludeTaxNumFieldsValue(String headerValue) {
     return (headerValue == null
             || headerValue == ""
             || headerValue.equalsIgnoreCase("FALSE")

@@ -21,9 +21,11 @@ import com.codahale.metrics.Timer;
 import com.newrelic.api.agent.Trace;
 import gov.cms.bfd.model.rif.Beneficiary;
 import gov.cms.bfd.server.war.Operation;
+import gov.cms.bfd.server.war.commons.CommonHeaders;
 import gov.cms.bfd.server.war.commons.LoadedFilterManager;
 import gov.cms.bfd.server.war.commons.OffsetLinkBuilder;
 import gov.cms.bfd.server.war.commons.QueryUtils;
+import gov.cms.bfd.server.war.commons.RequestHeaders;
 import gov.cms.bfd.server.war.commons.TransformerConstants;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -61,7 +63,8 @@ import org.springframework.stereotype.Component;
  * derived from the CCW claims.
  */
 @Component
-public final class R4ExplanationOfBenefitResourceProvider implements IResourceProvider {
+public final class R4ExplanationOfBenefitResourceProvider
+    implements IResourceProvider, CommonHeaders {
   private static final Logger LOGGER =
       LoggerFactory.getLogger(R4ExplanationOfBenefitResourceProvider.class);
 
@@ -226,6 +229,10 @@ public final class R4ExplanationOfBenefitResourceProvider implements IResourcePr
     String beneficiaryId = patient.getIdPart();
     Set<ClaimTypeV2> claimTypes = parseTypeParam(type);
     OffsetLinkBuilder paging = new OffsetLinkBuilder(requestDetails, "/ExplanationOfBenefit?");
+
+    RequestHeaders requestHeader = RequestHeaders.getHeaderWrapper(requestDetails);
+
+    boolean includeTax = requestHeader.getValue(HEADER_NAME_INCLUDE_TAX_NUM_FIELDS);
 
     Operation operation = new Operation(Operation.Endpoint.V1_EOB);
     operation.setOption("by", "patient");

@@ -21,6 +21,7 @@ import com.codahale.metrics.Timer;
 import com.newrelic.api.agent.Trace;
 import gov.cms.bfd.model.rif.Beneficiary;
 import gov.cms.bfd.server.war.Operation;
+import gov.cms.bfd.server.war.commons.CommonHeaders;
 import gov.cms.bfd.server.war.commons.LoadedFilterManager;
 import gov.cms.bfd.server.war.commons.OffsetLinkBuilder;
 import gov.cms.bfd.server.war.commons.QueryUtils;
@@ -61,7 +62,8 @@ import org.springframework.stereotype.Component;
  * derived from the CCW claims.
  */
 @Component
-public final class ExplanationOfBenefitResourceProvider implements IResourceProvider {
+public final class ExplanationOfBenefitResourceProvider
+    implements IResourceProvider, CommonHeaders {
   private static final Logger LOGGER =
       LoggerFactory.getLogger(ExplanationOfBenefitResourceProvider.class);
 

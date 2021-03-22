@@ -15,11 +15,20 @@ public interface CommonHeaders {
       Arrays.asList("true", "false", "hicn", "mbi");
 
   /**
+   * The header key used to determine whether include tax num field in response. See {@link
+   * #RequestHeaders.getValue(<header-name>)} for details.
+   */
+  public static final String HEADER_NAME_INCLUDE_TAX_NUM_FIELDS = "IncludeTaxNumFields";
+
+  /**
    * The header key used to determine whether include derived addresses fields in response. See
    * {@link #RequestHeaders.getValue(<header-name>)} for details.
    */
   public static final String HEADER_NAME_INCLUDE_ADDRESS_FIELDS = "IncludeAddressFields";
 
   public static final List<String> FHIR_REQUEST_HEADERS =
-      Arrays.asList(HEADER_NAME_INCLUDE_ADDRESS_FIELDS, HEADER_NAME_INCLUDE_IDENTIFIERS);
+      Arrays.asList(
+          HEADER_NAME_INCLUDE_ADDRESS_FIELDS,
+          HEADER_NAME_INCLUDE_IDENTIFIERS,
+          HEADER_NAME_INCLUDE_TAX_NUM_FIELDS);
 }
