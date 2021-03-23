@@ -8,6 +8,7 @@ import gov.cms.bfd.model.rif.samples.StaticRifResource;
 import gov.cms.bfd.model.rif.samples.StaticRifResourceGroup;
 import gov.cms.bfd.server.war.ServerTestUtils;
 import gov.cms.bfd.server.war.commons.MedicareSegment;
+import gov.cms.bfd.server.war.commons.RequestHeaders;
 import gov.cms.bfd.server.war.commons.TransformerConstants;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -42,7 +43,7 @@ public final class DMEClaimTransformerTest {
             .get();
 
     ExplanationOfBenefit eob = DMEClaimTransformer.transform(new MetricRegistry(), claim);
-    assertMatches(claim, eob);
+    assertMatches(claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
   }
 
   /**
@@ -54,7 +55,8 @@ public final class DMEClaimTransformerTest {
    *     DMEClaim}
    * @throws FHIRException (indicates test failure)
    */
-  static void assertMatches(DMEClaim claim, ExplanationOfBenefit eob) throws FHIRException {
+  static void assertMatches(DMEClaim claim, ExplanationOfBenefit eob, RequestHeaders requestHeader)
+      throws FHIRException {
     // Test to ensure group level fields between all claim types match
     TransformerTestUtils.assertEobCommonClaimHeaderData(
         eob,
@@ -185,6 +187,7 @@ public final class DMEClaimTransformerTest {
     TransformerTestUtils.assertEobCommonItemCarrierDMEEquals(
         eobItem0,
         eob,
+        requestHeader,
         claimLine1.getServiceCount(),
         claimLine1.getPlaceOfServiceCode(),
         claimLine1.getFirstExpenseDate(),

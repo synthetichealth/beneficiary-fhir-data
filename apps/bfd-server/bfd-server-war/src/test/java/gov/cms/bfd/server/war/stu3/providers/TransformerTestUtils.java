@@ -27,6 +27,7 @@ import gov.cms.bfd.model.rif.SNFClaimColumn;
 import gov.cms.bfd.model.rif.SNFClaimLine;
 import gov.cms.bfd.server.war.commons.Diagnosis;
 import gov.cms.bfd.server.war.commons.MedicareSegment;
+import gov.cms.bfd.server.war.commons.RequestHeaders;
 import gov.cms.bfd.server.war.commons.TransformerConstants;
 import gov.cms.bfd.sharedutils.exceptions.BadCodeMonkeyException;
 import java.io.IOException;
@@ -1605,6 +1606,7 @@ final class TransformerTestUtils {
   static void assertEobCommonItemCarrierDMEEquals(
       ItemComponent item,
       ExplanationOfBenefit eob,
+      RequestHeaders requestHeader,
       BigDecimal serviceCount,
       String placeOfServiceCode,
       Optional<LocalDate> firstExpenseDate,
@@ -1691,6 +1693,16 @@ final class TransformerTestUtils {
         TransformerConstants.CODING_NDC,
         TransformerConstants.CODING_NDC,
         nationalDrugCode.get());
+
+    Boolean inclTaxNumFlds =
+        (Boolean)
+            requestHeader.getValue(PatientResourceProvider.HEADER_NAME_INCLUDE_TAX_NUM_FIELDS);
+
+    if (inclTaxNumFlds != null && inclTaxNumFlds) {
+
+    } else {
+
+    }
   }
 
   /**
@@ -2057,5 +2069,16 @@ final class TransformerTestUtils {
           TransformerConstants.FALLBACK_LAST_UPDATED,
           actualResource.getMeta().getLastUpdated());
     }
+  }
+
+  /**
+   * test helper
+   *
+   * @param value of all include address fields values
+   * @return RequestHeaders instance derived from value
+   */
+  public static RequestHeaders getRHwithIncldTaxNumFldHdr(String value) {
+    return RequestHeaders.getHeaderWrapper(
+        ExplanationOfBenefitResourceProvider.HEADER_NAME_INCLUDE_TAX_NUM_FIELDS, value);
   }
 }

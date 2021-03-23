@@ -127,6 +127,12 @@ final class DMEClaimTransformer {
       ItemComponent item = eob.addItem();
       item.setSequence(claimLine.getLineNumber().intValue());
 
+      //   if (!Strings.isNullOrEmpty(claimLine.getProviderTaxNumber())) {
+      //     item.addExtension(
+      //         TransformerUtils.createExtensionCoding(
+      //             eob, CcwCodebookVariable.TAX_NUM, claimLine.getProviderTaxNumber()));
+      //   }
+
       /*
        * add an extension for the provider billing number as there is not a good place
        * to map this in the existing FHIR specification

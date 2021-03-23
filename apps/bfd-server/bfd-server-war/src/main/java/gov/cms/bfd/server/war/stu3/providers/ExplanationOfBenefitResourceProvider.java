@@ -25,6 +25,7 @@ import gov.cms.bfd.server.war.commons.CommonHeaders;
 import gov.cms.bfd.server.war.commons.LoadedFilterManager;
 import gov.cms.bfd.server.war.commons.OffsetLinkBuilder;
 import gov.cms.bfd.server.war.commons.QueryUtils;
+import gov.cms.bfd.server.war.commons.RequestHeaders;
 import gov.cms.bfd.server.war.commons.TransformerConstants;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -143,6 +144,12 @@ public final class ExplanationOfBenefitResourceProvider
     operation.setOption("by", "id");
     operation.publishOperationName();
 
+    RequestHeaders requestHeader = RequestHeaders.getHeaderWrapper(requestDetails);
+
+    Boolean inclTaxNumFlds =
+        (Boolean)
+            requestHeader.getValue(PatientResourceProvider.HEADER_NAME_INCLUDE_TAX_NUM_FIELDS);
+
     Class<?> entityClass = eobIdType.get().getEntityClass();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery criteria = builder.createQuery(entityClass);
@@ -245,6 +252,12 @@ public final class ExplanationOfBenefitResourceProvider
     operation.setOption(
         "service-date", Boolean.toString(serviceDate != null && !serviceDate.isEmpty()));
     operation.publishOperationName();
+
+    RequestHeaders requestHeader = RequestHeaders.getHeaderWrapper(requestDetails);
+
+    Boolean inclTaxNumFlds =
+        (Boolean)
+            requestHeader.getValue(PatientResourceProvider.HEADER_NAME_INCLUDE_TAX_NUM_FIELDS);
 
     List<IBaseResource> eobs = new ArrayList<IBaseResource>();
 

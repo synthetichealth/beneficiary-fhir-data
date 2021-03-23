@@ -112,6 +112,12 @@ final class CarrierClaimTransformer {
       ItemComponent item = eob.addItem();
       item.setSequence(claimLine.getLineNumber().intValue());
 
+      //   if (!Strings.isNullOrEmpty(claimLine.getProviderTaxNumber())) {
+      //     item.addExtension(
+      //         TransformerUtils.createExtensionCoding(
+      //             eob, CcwCodebookVariable.TAX_NUM, claimLine.getProviderTaxNumber()));
+      //   }
+
       /*
        * Per Michelle at GDIT, and also Tony Dean at OEDA, the performing provider _should_ always
        * be present. However, we've found some examples in production where it's not for some claim

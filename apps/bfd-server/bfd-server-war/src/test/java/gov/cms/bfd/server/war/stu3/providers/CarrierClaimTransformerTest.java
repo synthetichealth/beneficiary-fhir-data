@@ -8,6 +8,7 @@ import gov.cms.bfd.model.rif.samples.StaticRifResource;
 import gov.cms.bfd.model.rif.samples.StaticRifResourceGroup;
 import gov.cms.bfd.server.war.ServerTestUtils;
 import gov.cms.bfd.server.war.commons.MedicareSegment;
+import gov.cms.bfd.server.war.commons.RequestHeaders;
 import gov.cms.bfd.server.war.commons.TransformerConstants;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -45,12 +46,14 @@ public final class CarrierClaimTransformerTest {
     claim.setLastUpdated(new Date());
     ExplanationOfBenefit eobWithLastUpdated =
         CarrierClaimTransformer.transform(new MetricRegistry(), claim);
-    assertMatches(claim, eobWithLastUpdated);
+    assertMatches(
+        claim, eobWithLastUpdated, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
 
     claim.setLastUpdated(null);
     ExplanationOfBenefit eobWithoutLastUpdated =
         CarrierClaimTransformer.transform(new MetricRegistry(), claim);
-    assertMatches(claim, eobWithoutLastUpdated);
+    assertMatches(
+        claim, eobWithoutLastUpdated, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
   }
 
   /**
@@ -72,7 +75,7 @@ public final class CarrierClaimTransformerTest {
             .get();
 
     ExplanationOfBenefit eob = CarrierClaimTransformer.transform(new MetricRegistry(), claim);
-    assertMatches(claim, eob);
+    assertMatches(claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
   }
 
   /**
@@ -84,7 +87,9 @@ public final class CarrierClaimTransformerTest {
    *     CarrierClaim}
    * @throws FHIRException (indicates test failure)
    */
-  static void assertMatches(CarrierClaim claim, ExplanationOfBenefit eob) throws FHIRException {
+  static void assertMatches(
+      CarrierClaim claim, ExplanationOfBenefit eob, RequestHeaders requestHeaders)
+      throws FHIRException {
     // Test to ensure group level fields between all claim types match
     TransformerTestUtils.assertEobCommonClaimHeaderData(
         eob,
@@ -212,6 +217,7 @@ public final class CarrierClaimTransformerTest {
     TransformerTestUtils.assertEobCommonItemCarrierDMEEquals(
         eobItem0,
         eob,
+        requestHeaders,
         claimLine1.getServiceCount(),
         claimLine1.getPlaceOfServiceCode(),
         claimLine1.getFirstExpenseDate(),

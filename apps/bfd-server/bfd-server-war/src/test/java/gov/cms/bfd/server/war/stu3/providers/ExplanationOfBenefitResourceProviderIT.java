@@ -91,7 +91,8 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .execute();
 
     Assert.assertNotNull(eob);
-    CarrierClaimTransformerTest.assertMatches(claim, eob);
+    CarrierClaimTransformerTest.assertMatches(
+        claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
   }
 
   /**
@@ -125,7 +126,7 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .execute();
 
     Assert.assertNotNull(eob);
-    CarrierClaimTransformerTest.assertMatches(claim, eob);
+    CarrierClaimTransformerTest.assertMatches(claim, eob, requestHeader);
   }
 
   /**
@@ -159,7 +160,7 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .execute();
 
     Assert.assertNotNull(eob);
-    CarrierClaimTransformerTest.assertMatches(claim, eob);
+    CarrierClaimTransformerTest.assertMatches(claim, eob, requestHeader);
   }
 
   /**
@@ -191,7 +192,7 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .execute();
 
     Assert.assertNotNull(eob);
-    CarrierClaimTransformerTest.assertMatches(claim, eob);
+    CarrierClaimTransformerTest.assertMatches(claim, eob, requestHeader);
   }
   /**
    * Verifies that {@link
@@ -239,7 +240,8 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .execute();
 
     Assert.assertNotNull(eob);
-    DMEClaimTransformerTest.assertMatches(claim, eob);
+    DMEClaimTransformerTest.assertMatches(
+        claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
   }
 
   /**
@@ -273,7 +275,8 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .execute();
 
     Assert.assertNotNull(eob);
-    DMEClaimTransformerTest.assertMatches(claim, eob);
+    DMEClaimTransformerTest.assertMatches(
+        claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
   }
 
   /**
@@ -307,7 +310,8 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .execute();
 
     Assert.assertNotNull(eob);
-    DMEClaimTransformerTest.assertMatches(claim, eob);
+    DMEClaimTransformerTest.assertMatches(
+        claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
   }
 
   /**
@@ -339,7 +343,8 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .execute();
 
     Assert.assertNotNull(eob);
-    DMEClaimTransformerTest.assertMatches(claim, eob);
+    DMEClaimTransformerTest.assertMatches(
+        claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
   }
 
   /**
@@ -753,7 +758,9 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .get();
     Assert.assertEquals(1, filterToClaimType(searchResults, ClaimType.CARRIER).size());
     CarrierClaimTransformerTest.assertMatches(
-        carrierClaim, filterToClaimType(searchResults, ClaimType.CARRIER).get(0));
+        carrierClaim,
+        filterToClaimType(searchResults, ClaimType.CARRIER).get(0),
+        TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
 
     DMEClaim dmeClaim =
         loadedRecords.stream()
@@ -762,7 +769,9 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .findFirst()
             .get();
     DMEClaimTransformerTest.assertMatches(
-        dmeClaim, filterToClaimType(searchResults, ClaimType.DME).get(0));
+        dmeClaim,
+        filterToClaimType(searchResults, ClaimType.DME).get(0),
+        TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
 
     HHAClaim hhaClaim =
         loadedRecords.stream()
@@ -918,7 +927,9 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .get();
     Assert.assertEquals(1, filterToClaimTypeFromList(combinedResults, ClaimType.CARRIER).size());
     CarrierClaimTransformerTest.assertMatches(
-        carrierClaim, filterToClaimTypeFromList(combinedResults, ClaimType.CARRIER).get(0));
+        carrierClaim,
+        filterToClaimTypeFromList(combinedResults, ClaimType.CARRIER).get(0),
+        TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
 
     DMEClaim dmeClaim =
         loadedRecords.stream()
@@ -927,7 +938,9 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .findFirst()
             .get();
     DMEClaimTransformerTest.assertMatches(
-        dmeClaim, filterToClaimTypeFromList(combinedResults, ClaimType.DME).get(0));
+        dmeClaim,
+        filterToClaimTypeFromList(combinedResults, ClaimType.DME).get(0),
+        TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
 
     HHAClaim hhaClaim =
         loadedRecords.stream()
@@ -1169,7 +1182,9 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .get();
     Assert.assertEquals(1, filterToClaimType(searchResults, ClaimType.CARRIER).size());
     CarrierClaimTransformerTest.assertMatches(
-        carrierClaim, filterToClaimType(searchResults, ClaimType.CARRIER).get(0));
+        carrierClaim,
+        filterToClaimType(searchResults, ClaimType.CARRIER).get(0),
+        TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
 
     DMEClaim dmeClaim =
         loadedRecords.stream()
@@ -1178,7 +1193,9 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .findFirst()
             .get();
     DMEClaimTransformerTest.assertMatches(
-        dmeClaim, filterToClaimType(searchResults, ClaimType.DME).get(0));
+        dmeClaim,
+        filterToClaimType(searchResults, ClaimType.DME).get(0),
+        TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
 
     HHAClaim hhaClaim =
         loadedRecords.stream()
@@ -1301,7 +1318,9 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .get();
     Assert.assertEquals(1, filterToClaimType(searchResults, ClaimType.CARRIER).size());
     CarrierClaimTransformerTest.assertMatches(
-        carrierClaim, filterToClaimType(searchResults, ClaimType.CARRIER).get(0));
+        carrierClaim,
+        filterToClaimType(searchResults, ClaimType.CARRIER).get(0),
+        TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
 
     DMEClaim dmeClaim =
         loadedRecords.stream()
@@ -1310,7 +1329,9 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .findFirst()
             .get();
     DMEClaimTransformerTest.assertMatches(
-        dmeClaim, filterToClaimType(searchResults, ClaimType.DME).get(0));
+        dmeClaim,
+        filterToClaimType(searchResults, ClaimType.DME).get(0),
+        TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
 
     HHAClaim hhaClaim =
         loadedRecords.stream()
