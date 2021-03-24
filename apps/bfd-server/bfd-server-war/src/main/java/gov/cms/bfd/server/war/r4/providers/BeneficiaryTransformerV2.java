@@ -117,23 +117,24 @@ final class BeneficiaryTransformerV2 {
     TransformerUtilsV2.setLastUpdated(patient, beneficiary.getLastUpdated());
 
     // NOTE - No longer returning any HCIN value(s) in V2
+    //        We always return unhashed MBI(s)
+
+    Period mbiPeriod = new Period();
+    if (beneficiary.getMbiEffectiveDate().isPresent()) {
+      TransformerUtilsV2.setPeriodStart(mbiPeriod, beneficiary.getMbiEffectiveDate().get());
+    }
+    if (beneficiary.getMbiObsoleteDate().isPresent()) {
+      TransformerUtilsV2.setPeriodEnd(mbiPeriod, beneficiary.getMbiObsoleteDate().get());
+    }
+
+    addUnhashedIdentifier(
+        patient,
+        mbiUnhashedCurrent.get(),
+        TransformerConstants.CODING_SYSTEM_HL7_IDENTIFIER_TYPE,
+        TransformerUtilsV2.createIdentifierCurrencyExtension(CurrencyIdentifier.CURRENT),
+        mbiPeriod);
 
     if (requestHeader.isMBIinIncludeIdentifiers()) {
-      Period mbiPeriod = new Period();
-      if (beneficiary.getMbiEffectiveDate().isPresent()) {
-        TransformerUtilsV2.setPeriodStart(mbiPeriod, beneficiary.getMbiEffectiveDate().get());
-      }
-      if (beneficiary.getMbiObsoleteDate().isPresent()) {
-        TransformerUtilsV2.setPeriodEnd(mbiPeriod, beneficiary.getMbiObsoleteDate().get());
-      }
-
-      addUnhashedIdentifier(
-          patient,
-          mbiUnhashedCurrent.get(),
-          TransformerConstants.CODING_SYSTEM_HL7_IDENTIFIER_TYPE,
-          TransformerUtilsV2.createIdentifierCurrencyExtension(CurrencyIdentifier.CURRENT),
-          mbiPeriod);
-
       Extension historicalIdentifier =
           TransformerUtilsV2.createIdentifierCurrencyExtension(CurrencyIdentifier.HISTORIC);
       List<String> unhashedMbis = new ArrayList<String>();

@@ -174,16 +174,6 @@ public final class R4PatientResourceProvider implements IResourceProvider, Commo
           beneficiary == null ? 0 : 1);
     }
 
-    // Null out the unhashed HICNs if we're not supposed to be returning them
-    if (!requestHeader.isHICNinIncludeIdentifiers()) {
-      beneficiary.setHicnUnhashed(Optional.empty());
-    }
-
-    // Null out the unhashed MBIs if we're not supposed to be returning
-    if (!requestHeader.isMBIinIncludeIdentifiers()) {
-      beneficiary.setMedicareBeneficiaryId(Optional.empty());
-    }
-
     return BeneficiaryTransformerV2.transform(metricRegistry, beneficiary, requestHeader);
   }
 
