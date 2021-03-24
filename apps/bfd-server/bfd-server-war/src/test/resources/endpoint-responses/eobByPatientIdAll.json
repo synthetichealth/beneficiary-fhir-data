@@ -881,6 +881,12 @@
       },
       "item" : [ {
         "extension" : [ {
+          "url" : "https://bluebutton.cms.gov/resources/variables/tax_num",
+          "valueCoding" : {
+            "system" : "https://bluebutton.cms.gov/resources/variables/tax_num",
+            "code" : "9994931888"
+          }
+        }, {
           "url" : "https://bluebutton.cms.gov/resources/variables/suplrnum",
           "valueIdentifier" : {
             "system" : "https://bluebutton.cms.gov/resources/variables/suplrnum",
@@ -3742,6 +3748,12 @@
       },
       "item" : [ {
         "extension" : [ {
+          "url" : "https://bluebutton.cms.gov/resources/variables/tax_num",
+          "valueCoding" : {
+            "system" : "https://bluebutton.cms.gov/resources/variables/tax_num",
+            "code" : "204299999"
+          }
+        }, {
           "url" : "https://bluebutton.cms.gov/resources/variables/carr_line_mtus_cd",
           "valueCoding" : {
             "system" : "https://bluebutton.cms.gov/resources/variables/carr_line_mtus_cd",

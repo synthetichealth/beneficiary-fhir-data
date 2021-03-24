@@ -47,13 +47,13 @@ public final class CarrierClaimTransformerTest {
     ExplanationOfBenefit eobWithLastUpdated =
         CarrierClaimTransformer.transform(new MetricRegistry(), claim);
     assertMatches(
-        claim, eobWithLastUpdated, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
+        claim, eobWithLastUpdated, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("true"));
 
     claim.setLastUpdated(null);
     ExplanationOfBenefit eobWithoutLastUpdated =
         CarrierClaimTransformer.transform(new MetricRegistry(), claim);
     assertMatches(
-        claim, eobWithoutLastUpdated, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
+        claim, eobWithoutLastUpdated, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("true"));
   }
 
   /**
@@ -75,7 +75,7 @@ public final class CarrierClaimTransformerTest {
             .get();
 
     ExplanationOfBenefit eob = CarrierClaimTransformer.transform(new MetricRegistry(), claim);
-    assertMatches(claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
+    assertMatches(claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("true"));
   }
 
   /**
@@ -240,7 +240,8 @@ public final class CarrierClaimTransformerTest {
         claimLine1.getHctHgbTestTypeCode(),
         claimLine1.getHctHgbTestResult(),
         claimLine1.getCmsServiceTypeCode(),
-        claimLine1.getNationalDrugCode());
+        claimLine1.getNationalDrugCode(),
+        claimLine1.getProviderTaxNumber());
 
     // Test lastUpdated
     TransformerTestUtils.assertLastUpdatedEquals(claim.getLastUpdated(), eob);

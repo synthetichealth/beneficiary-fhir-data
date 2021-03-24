@@ -167,12 +167,6 @@ final class DMEClaimTransformerV2 {
       // CLM_LINE_NUM => item.sequence
       item.setSequence(line.getLineNumber().intValue());
 
-      //   if (!Strings.isNullOrEmpty(line.getProviderTaxNumber())) {
-      //     item.addExtension(
-      //         TransformerUtilsV2.createExtensionCoding(
-      //             eob, CcwCodebookVariable.TAX_NUM, line.getProviderTaxNumber()));
-      //   }
-
       // add an extension for the provider billing number as there is not a good place
       // to map this in the existing FHIR specification
       // PRVDR_NUM => ExplanationOfBenefit.provider.value
@@ -359,7 +353,8 @@ final class DMEClaimTransformerV2 {
           line.getHctHgbTestTypeCode(),
           line.getHctHgbTestResult(),
           line.getCmsServiceTypeCode(),
-          line.getNationalDrugCode());
+          line.getNationalDrugCode(),
+          line.getProviderTaxNumber());
 
       // PRVDR_STATE_CD => ExplanationOfBenefit.item.location.extension
       if (line.getProviderStateCode() != null) {

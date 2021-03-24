@@ -638,6 +638,25 @@ final class TransformerTestUtils {
   }
 
   /**
+   * FIXME change name of this and related methods to assertHasExtensionCoding(...)
+   *
+   * @param ccwVariable the {@link CcwCodebookVariable} that the expected {@link Extension} / {@link
+   *     Coding} are for
+   * @param expectedCode the expected {@link Coding#getCode()}
+   * @param actualElement the FHIR element to find and verify the {@link Extension} of
+   */
+  static void assertExtensionCodingNotEquals(
+      CcwCodebookInterface ccwVariable, String expectedCode, IBaseHasExtensions actualElement) {
+    String expectedExtensionUrl = TransformerUtils.calculateVariableReferenceUrl(ccwVariable);
+    Optional<? extends IBaseExtension<?, ?>> extensionForUrl =
+        actualElement.getExtension().stream()
+            .filter(e -> e.getUrl().equals(expectedExtensionUrl))
+            .findFirst();
+
+    Assert.assertFalse(extensionForUrl.isPresent());
+  }
+
+  /**
    * @param fhirElement the FHIR element to check the extension of
    * @param expectedExtensionUrl the expected {@link Extension#getUrl()} of the {@link Extension} to
    *     look for
@@ -1629,7 +1648,8 @@ final class TransformerTestUtils {
       Optional<String> hctHgbTestTypeCode,
       BigDecimal hctHgbTestResult,
       char cmsServiceTypeCode,
-      Optional<String> nationalDrugCode)
+      Optional<String> nationalDrugCode,
+      String taxNumber)
       throws FHIRException {
 
     Assert.assertEquals(serviceCount, item.getQuantity().getValue());
@@ -1696,12 +1716,13 @@ final class TransformerTestUtils {
 
     Boolean inclTaxNumFlds =
         (Boolean)
-            requestHeader.getValue(PatientResourceProvider.HEADER_NAME_INCLUDE_TAX_NUM_FIELDS);
+            requestHeader.getValue(
+                ExplanationOfBenefitResourceProvider.HEADER_NAME_INCLUDE_TAX_NUM_FIELDS);
 
-    if (inclTaxNumFlds != null && inclTaxNumFlds) {
-
+    if (inclTaxNumFlds) {
+      assertExtensionCodingEquals(CcwCodebookVariable.TAX_NUM, taxNumber, item);
     } else {
-
+      assertExtensionCodingNotEquals(CcwCodebookVariable.TAX_NUM, taxNumber, item);
     }
   }
 

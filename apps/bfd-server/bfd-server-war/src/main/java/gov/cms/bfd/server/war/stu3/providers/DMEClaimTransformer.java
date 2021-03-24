@@ -127,12 +127,6 @@ final class DMEClaimTransformer {
       ItemComponent item = eob.addItem();
       item.setSequence(claimLine.getLineNumber().intValue());
 
-      //   if (!Strings.isNullOrEmpty(claimLine.getProviderTaxNumber())) {
-      //     item.addExtension(
-      //         TransformerUtils.createExtensionCoding(
-      //             eob, CcwCodebookVariable.TAX_NUM, claimLine.getProviderTaxNumber()));
-      //   }
-
       /*
        * add an extension for the provider billing number as there is not a good place
        * to map this in the existing FHIR specification
@@ -249,7 +243,8 @@ final class DMEClaimTransformer {
           claimLine.getHctHgbTestTypeCode(),
           claimLine.getHctHgbTestResult(),
           claimLine.getCmsServiceTypeCode(),
-          claimLine.getNationalDrugCode());
+          claimLine.getNationalDrugCode(),
+          claimLine.getProviderTaxNumber());
 
       if (!claimLine.getProviderStateCode().isEmpty()) {
         // FIXME Should this be pulled to a common mapping method?

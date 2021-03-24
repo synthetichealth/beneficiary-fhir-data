@@ -43,7 +43,7 @@ public final class DMEClaimTransformerTest {
             .get();
 
     ExplanationOfBenefit eob = DMEClaimTransformer.transform(new MetricRegistry(), claim);
-    assertMatches(claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
+    assertMatches(claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("true"));
   }
 
   /**
@@ -210,7 +210,8 @@ public final class DMEClaimTransformerTest {
         claimLine1.getHctHgbTestTypeCode(),
         claimLine1.getHctHgbTestResult(),
         claimLine1.getCmsServiceTypeCode(),
-        claimLine1.getNationalDrugCode());
+        claimLine1.getNationalDrugCode(),
+        claimLine1.getProviderTaxNumber());
 
     // Test lastUpdated
     TransformerTestUtils.assertLastUpdatedEquals(claim.getLastUpdated(), eob);

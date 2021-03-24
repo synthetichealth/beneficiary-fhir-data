@@ -92,7 +92,7 @@ public final class ExplanationOfBenefitResourceProviderIT {
 
     Assert.assertNotNull(eob);
     CarrierClaimTransformerTest.assertMatches(
-        claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
+        claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("true"));
   }
 
   /**
@@ -275,8 +275,7 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .execute();
 
     Assert.assertNotNull(eob);
-    DMEClaimTransformerTest.assertMatches(
-        claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
+    DMEClaimTransformerTest.assertMatches(claim, eob, requestHeader);
   }
 
   /**
@@ -310,8 +309,7 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .execute();
 
     Assert.assertNotNull(eob);
-    DMEClaimTransformerTest.assertMatches(
-        claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
+    DMEClaimTransformerTest.assertMatches(claim, eob, requestHeader);
   }
 
   /**
@@ -343,8 +341,7 @@ public final class ExplanationOfBenefitResourceProviderIT {
             .execute();
 
     Assert.assertNotNull(eob);
-    DMEClaimTransformerTest.assertMatches(
-        claim, eob, TransformerTestUtils.getRHwithIncldTaxNumFldHdr("false"));
+    DMEClaimTransformerTest.assertMatches(claim, eob, requestHeader);
   }
 
   /**

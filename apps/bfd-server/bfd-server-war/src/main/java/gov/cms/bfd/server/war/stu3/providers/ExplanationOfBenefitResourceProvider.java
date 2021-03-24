@@ -145,10 +145,7 @@ public final class ExplanationOfBenefitResourceProvider
     operation.publishOperationName();
 
     RequestHeaders requestHeader = RequestHeaders.getHeaderWrapper(requestDetails);
-
-    Boolean inclTaxNumFlds =
-        (Boolean)
-            requestHeader.getValue(PatientResourceProvider.HEADER_NAME_INCLUDE_TAX_NUM_FIELDS);
+    Boolean includeTaxNumFields = TransformerUtils.isTaxNumberPresent(requestHeader);
 
     Class<?> entityClass = eobIdType.get().getEntityClass();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -176,6 +173,9 @@ public final class ExplanationOfBenefitResourceProvider
     }
 
     ExplanationOfBenefit eob = eobIdType.get().getTransformer().apply(metricRegistry, claimEntity);
+
+    if (!includeTaxNumFields) {}
+
     return eob;
   }
 
@@ -255,9 +255,7 @@ public final class ExplanationOfBenefitResourceProvider
 
     RequestHeaders requestHeader = RequestHeaders.getHeaderWrapper(requestDetails);
 
-    Boolean inclTaxNumFlds =
-        (Boolean)
-            requestHeader.getValue(PatientResourceProvider.HEADER_NAME_INCLUDE_TAX_NUM_FIELDS);
+    Boolean includeTaxNumFields = TransformerUtils.isTaxNumberPresent(requestHeader);
 
     List<IBaseResource> eobs = new ArrayList<IBaseResource>();
 
@@ -275,44 +273,50 @@ public final class ExplanationOfBenefitResourceProvider
       eobs.addAll(
           transformToEobs(
               ClaimType.CARRIER,
-              findClaimTypeByPatient(ClaimType.CARRIER, beneficiaryId, lastUpdated, serviceDate)));
+              findClaimTypeByPatient(ClaimType.CARRIER, beneficiaryId, lastUpdated, serviceDate),
+              includeTaxNumFields));
     if (claimTypes.contains(ClaimType.DME))
       eobs.addAll(
           transformToEobs(
               ClaimType.DME,
-              findClaimTypeByPatient(ClaimType.DME, beneficiaryId, lastUpdated, serviceDate)));
+              findClaimTypeByPatient(ClaimType.DME, beneficiaryId, lastUpdated, serviceDate),
+              includeTaxNumFields));
     if (claimTypes.contains(ClaimType.HHA))
       eobs.addAll(
           transformToEobs(
               ClaimType.HHA,
-              findClaimTypeByPatient(ClaimType.HHA, beneficiaryId, lastUpdated, serviceDate)));
+              findClaimTypeByPatient(ClaimType.HHA, beneficiaryId, lastUpdated, serviceDate),
+              includeTaxNumFields));
     if (claimTypes.contains(ClaimType.HOSPICE))
       eobs.addAll(
           transformToEobs(
               ClaimType.HOSPICE,
-              findClaimTypeByPatient(ClaimType.HOSPICE, beneficiaryId, lastUpdated, serviceDate)));
+              findClaimTypeByPatient(ClaimType.HOSPICE, beneficiaryId, lastUpdated, serviceDate),
+              includeTaxNumFields));
     if (claimTypes.contains(ClaimType.INPATIENT))
       eobs.addAll(
           transformToEobs(
               ClaimType.INPATIENT,
-              findClaimTypeByPatient(
-                  ClaimType.INPATIENT, beneficiaryId, lastUpdated, serviceDate)));
+              findClaimTypeByPatient(ClaimType.INPATIENT, beneficiaryId, lastUpdated, serviceDate),
+              includeTaxNumFields));
     if (claimTypes.contains(ClaimType.OUTPATIENT))
       eobs.addAll(
           transformToEobs(
               ClaimType.OUTPATIENT,
-              findClaimTypeByPatient(
-                  ClaimType.OUTPATIENT, beneficiaryId, lastUpdated, serviceDate)));
+              findClaimTypeByPatient(ClaimType.OUTPATIENT, beneficiaryId, lastUpdated, serviceDate),
+              includeTaxNumFields));
     if (claimTypes.contains(ClaimType.PDE))
       eobs.addAll(
           transformToEobs(
               ClaimType.PDE,
-              findClaimTypeByPatient(ClaimType.PDE, beneficiaryId, lastUpdated, serviceDate)));
+              findClaimTypeByPatient(ClaimType.PDE, beneficiaryId, lastUpdated, serviceDate),
+              includeTaxNumFields));
     if (claimTypes.contains(ClaimType.SNF))
       eobs.addAll(
           transformToEobs(
               ClaimType.SNF,
-              findClaimTypeByPatient(ClaimType.SNF, beneficiaryId, lastUpdated, serviceDate)));
+              findClaimTypeByPatient(ClaimType.SNF, beneficiaryId, lastUpdated, serviceDate),
+              includeTaxNumFields));
 
     if (Boolean.parseBoolean(excludeSamhsa)) filterSamhsa(eobs);
 
@@ -433,10 +437,18 @@ public final class ExplanationOfBenefitResourceProvider
    *     claim/event
    */
   @Trace
-  private List<ExplanationOfBenefit> transformToEobs(ClaimType claimType, List<?> claims) {
-    return claims.stream()
-        .map(c -> claimType.getTransformer().apply(metricRegistry, c))
-        .collect(Collectors.toList());
+  private List<ExplanationOfBenefit> transformToEobs(
+      ClaimType claimType, List<?> claims, Boolean includeTaxNumber) {
+    List<ExplanationOfBenefit> eobs =
+        claims.stream()
+            .map(c -> claimType.getTransformer().apply(metricRegistry, c))
+            .collect(Collectors.toList());
+
+    if (claimType == ClaimType.CARRIER || claimType == ClaimType.DME) {
+      if (!includeTaxNumber) {}
+    }
+
+    return eobs;
   }
 
   /**

@@ -172,12 +172,6 @@ public class CarrierClaimTransformerV2 {
       // LINE_NUM => ExplanationOfBenefit.item.sequence
       item.setSequence(line.getLineNumber().intValue());
 
-      //   if (!Strings.isNullOrEmpty(line.getProviderTaxNumber())) {
-      //     item.addExtension(
-      //         TransformerUtilsV2.createExtensionCoding(
-      //             eob, CcwCodebookVariable.TAX_NUM, line.getProviderTaxNumber()));
-      //   }
-
       // PRF_PHYSN_NPI => ExplanationOfBenefit.careTeam.provider
       Optional<CareTeamComponent> performing =
           TransformerUtilsV2.addCareTeamMember(
@@ -321,7 +315,8 @@ public class CarrierClaimTransformerV2 {
           line.getHctHgbTestTypeCode(),
           line.getHctHgbTestResult(),
           line.getCmsServiceTypeCode(),
-          line.getNationalDrugCode());
+          line.getNationalDrugCode(),
+          line.getProviderTaxNumber());
 
       // PRVDR_STATE_CD => ExplanationOfBenefit.item.location.extension
       line.getProviderStateCode()

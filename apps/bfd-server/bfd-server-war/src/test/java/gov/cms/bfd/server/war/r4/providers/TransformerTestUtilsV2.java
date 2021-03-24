@@ -532,7 +532,8 @@ public final class TransformerTestUtilsV2 {
       Optional<String> hctHgbTestTypeCode,
       BigDecimal hctHgbTestResult,
       char cmsServiceTypeCode,
-      Optional<String> nationalDrugCode)
+      Optional<String> nationalDrugCode,
+      String taxNumber)
       throws FHIRException {
 
     Assert.assertEquals(serviceCount, item.getQuantity().getValue());

@@ -235,7 +235,8 @@ public final class DMEClaimTransformerV2Test {
         claimLine1.getHctHgbTestTypeCode(),
         claimLine1.getHctHgbTestResult(),
         claimLine1.getCmsServiceTypeCode(),
-        claimLine1.getNationalDrugCode());
+        claimLine1.getNationalDrugCode()
+        claimLime1.getProviderTaxNumber());
     */
 
     // Test lastUpdated

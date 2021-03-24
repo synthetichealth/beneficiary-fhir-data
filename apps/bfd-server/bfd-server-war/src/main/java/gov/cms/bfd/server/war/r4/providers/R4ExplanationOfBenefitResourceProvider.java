@@ -27,7 +27,6 @@ import gov.cms.bfd.server.war.commons.OffsetLinkBuilder;
 import gov.cms.bfd.server.war.commons.QueryUtils;
 import gov.cms.bfd.server.war.commons.RequestHeaders;
 import gov.cms.bfd.server.war.commons.TransformerConstants;
-import gov.cms.bfd.server.war.stu3.providers.ExplanationOfBenefitResourceProvider;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -137,11 +136,7 @@ public final class R4ExplanationOfBenefitResourceProvider
       throw new IllegalArgumentException("Unsupported ID pattern: " + eobIdText);
 
     RequestHeaders requestHeader = RequestHeaders.getHeaderWrapper(requestDetails);
-
-    Boolean inclTaxNumFlds =
-        (Boolean)
-            requestHeader.getValue(
-                ExplanationOfBenefitResourceProvider.HEADER_NAME_INCLUDE_TAX_NUM_FIELDS);
+    Boolean includeTaxNumFields = TransformerUtilsV2.isTaxNumberPresent(requestHeader);
 
     String eobIdTypeText = eobIdMatcher.group(1);
     Optional<ClaimTypeV2> eobIdType = ClaimTypeV2.parse(eobIdTypeText);
@@ -179,6 +174,7 @@ public final class R4ExplanationOfBenefitResourceProvider
     }
 
     ExplanationOfBenefit eob = eobIdType.get().getTransformer().apply(metricRegistry, claimEntity);
+    if (!includeTaxNumFields) {}
     return eob;
   }
 
@@ -241,10 +237,7 @@ public final class R4ExplanationOfBenefitResourceProvider
 
     RequestHeaders requestHeader = RequestHeaders.getHeaderWrapper(requestDetails);
 
-    Boolean inclTaxNumFlds =
-        (Boolean)
-            requestHeader.getValue(
-                ExplanationOfBenefitResourceProvider.HEADER_NAME_INCLUDE_TAX_NUM_FIELDS);
+    Boolean includeTaxNumFields = TransformerUtilsV2.isTaxNumberPresent(requestHeader);
 
     Operation operation = new Operation(Operation.Endpoint.V2_EOB);
     operation.setOption("by", "patient");
